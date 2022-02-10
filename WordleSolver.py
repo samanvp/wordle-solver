@@ -176,8 +176,8 @@ def updateWeights(guessNo, counts, greens, newGreens, newYellows, latestBlacks, 
 
 def selectedTopWord():
     selection = -1
-    while(selection < 1 or selection > NUM_TOP_WORDS):
-        print('Which word you used (1, 2, 3, ..)? ', end='')
+    while(selection < 0 or selection > NUM_TOP_WORDS):
+        print('Which word you used (1, 2, 3, ..)? for a word other than these options enter 0: ', end='')
         try:
             selection = int(input())
         except:
@@ -194,10 +194,16 @@ def playGame(corpusFile, verbose=False):
     feedback = ''
     while(feedback != 'ggggg'):
         guessNo += 1
-        TopWords = findTopWord(counts, words)
-        selectedWord = selectedTopWord()
+        topWords = findTopWord(counts, words)
+        selectedIndex = selectedTopWord()
+        topWord = ''
+        if selectedIndex == -1:
+            print('Please enter the word you used: ', end='')
+            topWord = input()
+        else:
+            topWord = topWords[selectedIndex]
         feedback = validateFeedback()
-        (latestGreens, latestYellows, latestBlacks) = parseFeedback(TopWords[selectedWord], feedback)
+        (latestGreens, latestYellows, latestBlacks) = parseFeedback(topWord, feedback)
         (newGreens, newYellows, removedYellows) = updateState(greens, yellows, latestGreens, latestYellows)
         updateWeights(guessNo, counts, greens, newGreens, newYellows, latestBlacks, removedYellows)
 
