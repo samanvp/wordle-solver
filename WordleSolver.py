@@ -6,9 +6,9 @@ PUZZLE_SIZE = 5
 GREEN_COEFF = 1.6
 NUM_TOP_WORDS = 7
 
-RUSSIAN_CORPUS = '../Russian-words.txt'
-ENGLISH_CORPUS = '../wordle_complete_dictionary.txt'
-ENGLISH_SOLUTIONS = '../wordle_solutions_alphabetized.txt'
+RUSSIAN_CORPUS = './Russian-words.txt'
+ENGLISH_CORPUS = './wordle_complete_dictionary.txt'
+ENGLISH_SOLUTIONS = './wordle_solutions_alphabetized.txt'
 
 class CorpusLoader:
     def __init__(self, language):
