@@ -6,9 +6,9 @@ PUZZLE_SIZE = 5
 GREEN_COEFF = 1.6
 NUM_TOP_WORDS = 7
 
-RUSSIAN_CORPUS = '../WordleSolver/Russian-words.txt'
-ENGLISH_CORPUS = '../WordleSolver/wordle_complete_dictionary.txt'
-ENGLISH_SOLUTIONS = '../WordleSolver/wordle_solutions_alphabetized.txt'
+RUSSIAN_CORPUS = '../Russian-words.txt'
+ENGLISH_CORPUS = '../wordle_complete_dictionary.txt'
+ENGLISH_SOLUTIONS = '../wordle_solutions_alphabetized.txt'
 
 class CorpusLoader:
     def __init__(self, language):
@@ -277,11 +277,10 @@ class Solver:
         print('Solved by {} guesses!'.format(self.guessNo))
 
 def main():
-    #if len(sys.argv) != 2 or sys.argv[1] not in ['eng', 'rus']:
-    #    print('Please run `python3 WordleSolver.py eng` or `python3 WordleSolver.py rus`')
-    #    exit(1)
-    #corpus = CorpusLoader(sys.argv[1])
-    corpus = CorpusLoader('eng')
+    if len(sys.argv) != 2 or sys.argv[1] not in ['eng', 'rus']:
+        print('Please run `python3 WordleSolver.py eng` or `python3 WordleSolver.py rus`')
+        exit(1)
+    corpus = CorpusLoader(sys.argv[1])
     solver = Solver(corpus.getWords(), corpus.getLettersFreq())
     solver.playGame(True)
     
