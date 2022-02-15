@@ -6,9 +6,11 @@ PUZZLE_SIZE = 5
 GREEN_COEFF = 1.6
 NUM_TOP_WORDS = 7
 
+ENGLISH_CORPUS = './corpuses/sgb-words.txt'
 RUSSIAN_CORPUS = './corpuses/Russian-words.txt'
-ENGLISH_CORPUS = './corpuses/wordle_complete_dictionary.txt'
-ENGLISH_SOLUTIONS = './corpuses/wordle_solutions_alphabetized.txt'
+PERSIAN_CORPUS = './corpuses/PersianWordList.txt'
+WORDLE_CORPUS = './corpuses/wordle_complete_dictionary.txt'
+WORDLE_SOLUTIONS = './corpuses/wordle_solutions_alphabetized.txt'
 
 class CorpusLoader:
     def __init__(self, language):
@@ -16,19 +18,26 @@ class CorpusLoader:
 
     def getWords(self):
         if self.langague == 'eng':
-            #return self.loadWords(ENGLISH_CORPUS)
+            return self.loadWords(WORDLE_CORPUS)
             # Experimental
-            return self.loadWords(ENGLISH_SOLUTIONS)
+            #return self.loadWords(WORDLE_SOLUTIONS)
+            #return self.loadWords(ENGLISH_CORPUS)
         elif self.langague == 'rus':
             return self.loadWords(RUSSIAN_CORPUS)
+        elif self.langague == 'per':
+            return self.loadWords(PERSIAN_CORPUS, True)
         else:
             raise ValueError('Unknown langage: {} please enter either "eng" or "rus"'.format(self.langague))
 
     def getLettersFreq(self):
         if self.langague == 'eng':
-            return self.countLetters(self.loadWords(ENGLISH_SOLUTIONS))
+            return self.countLetters(self.loadWords(WORDLE_SOLUTIONS))
+            #return self.countLetters(self.loadWords(WORDLE_CORPUS))
+            #return self.countLetters(self.countLetters(ENGLISH_CORPUS))
         elif self.langague == 'rus':
             return self.countLetters(self.loadWords(RUSSIAN_CORPUS))
+        elif self.langague == 'per':
+            return self.countLetters(self.loadWords(PERSIAN_CORPUS))
         else:
             raise ValueError('Unknown langage: {} please enter either "eng" or "rus"'.format(self.langague))
 
@@ -38,9 +47,10 @@ class CorpusLoader:
             words = f.read().splitlines()
         if verbose:
             print('Conpus contains {} words.'.format(len(words)))
-        
+         
         selectedWords = []
         for word in words:
+            word = word.strip()
             if len(word) != PUZZLE_SIZE or word.find('-') != -1:
                 continue
             selectedWords.append(word)
@@ -85,7 +95,7 @@ class Solver:
         self.words = words
         self.lettersFreq = lettersFreq
    
-    def getScore(self, word):
+    def getScore(self, word, removeDups=True):
         scores = []
         for i in range(PUZZLE_SIZE):
             letter = word[i]
@@ -93,21 +103,26 @@ class Solver:
             if self.counts.get(key):
                 scores.append(self.counts[key])
             else:
-                scores.append(0.0)
+                key = (-1, letter)
+                scores.append(self.counts[key])
         
-        wordList = list(word)
-        alreadyDeDuped = set()
-        for letter in wordList:
-            if letter in alreadyDeDuped:
-                continue
-            dups = [i for i, x in enumerate(wordList) if x == letter]
-            if len(dups) > 1:
-                subScores = [scores[i] for i in dups]
-                keep = subScores.index(max(subScores))
-                for i in range(len(dups)):
-                    if i != keep:
-                        scores[dups[i]] = 0
-                alreadyDeDuped.add(letter)
+        if removeDups:
+            wordList = list(word)
+            alreadyDeDuped = set()
+            for letter in wordList:
+                if letter in alreadyDeDuped:
+                    continue
+                dups = [i for i, x in enumerate(wordList) if x == letter]
+                if len(dups) > 1:
+                    subScores = [scores[i] for i in dups]
+                    keep = subScores.index(max(subScores))
+                    for i in range(len(dups)):
+                        if i != keep:
+                            if scores[dups[i]] == MAX_PROB or scores[dups[i]] == -1 * PUZZLE_SIZE * MAX_PROB:
+                                continue;  # This is is green letter, we do not subtract it's score.
+                            scores[dups[i]] = 0
+                    alreadyDeDuped.add(letter)
+    
         return sum(scores)
 
     def findTopWord(self):
@@ -120,6 +135,8 @@ class Solver:
         print('Best {} words are:'.format(NUM_TOP_WORDS))
         for i in range(len(topIndices)):
             print('({}) >>>>>>> {} <<<<<<< score: {}'.format(i+1, self.words[topIndices[i]], round(scores[topIndices[i]], 4)))
+        if scores[topIndices[0]] < 0:
+            raise ValueError('There is no word with positive score.')
         return [self.words[i] for i in topIndices]
 
     def validateFeedback(self):
@@ -186,6 +203,17 @@ class Solver:
         self.blacks = self.blacks.union(latestBlacks)
         return (newGreens, newYellows, removedYellows)
 
+    def exploitGreens(self):
+        for i in range(PUZZLE_SIZE):
+            if self.greens[i]:
+                greenLetter = self.greens[i]
+                for key, _ in self.counts.items():
+                    if key[0] == i:
+                        if key[1] == greenLetter:
+                            self.counts[key] = MAX_PROB
+                        else:
+                            self.counts[key] =  -1 * PUZZLE_SIZE * MAX_PROB
+
     def updateWeights(self, newGreens, newYellows, latestBlacks, removedYellows):
         for letter in latestBlacks:
             for i in range(PUZZLE_SIZE):
@@ -219,9 +247,7 @@ class Solver:
         # Apply Greens
         if self.guessNo > 3 or missingLettersCount <= 2:
             # We aggresivly set all green weights to converge faster
-            for i in range(PUZZLE_SIZE):
-                if self.greens[i]:
-                    self.counts[(i, self.greens[i])] = MAX_PROB
+            self.exploitGreens()
         else:
             for i in range(PUZZLE_SIZE):
                 if newGreens[i]:
@@ -257,7 +283,11 @@ class Solver:
         feedbackColors = ''
         while(feedbackColors != 'ggggg'):
             self.guessNo += 1
-            topWords = self.findTopWord()
+            try:
+                topWords = self.findTopWord()
+            except:
+                print('No word in the current corpus matches the feedback.')
+                break
             topWord = self.readUsedWord(topWords)
             feedbackColors = self.validateFeedback()
             (latestGreens, latestYellows, latestBlacks) = self.parseFeedback(topWord, feedbackColors)
@@ -273,12 +303,14 @@ class Solver:
 
                 print('Current Blacks: ')
                 print(sorted(list(self.blacks)))
-
-        print('Solved by {} guesses!'.format(self.guessNo))
+        if feedbackColors == 'ggggg':
+            print('Solved by {} guesses!'.format(self.guessNo))
+        else:
+            print('Failed to find a solution after {} guesses.'.format(self.guessNo))
 
 def main():
-    if len(sys.argv) != 2 or sys.argv[1] not in ['eng', 'rus']:
-        print('Please run `python3 WordleSolver.py eng` or `python3 WordleSolver.py rus`')
+    if len(sys.argv) != 2 or sys.argv[1] not in ['eng', 'rus', 'per']:
+        print('Please run `python3 WordleSolver.py eng` or `python3 WordleSolver.py rus` or `python3 WordleSolver.py per`')
         exit(1)
     corpus = CorpusLoader(sys.argv[1])
     solver = Solver(corpus.getWords(), corpus.getLettersFreq())

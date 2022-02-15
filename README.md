@@ -1,13 +1,18 @@
 # wordle-solver
-A universal Wordle solver that works with any language. All you need is a corpus for your language: a text file containing words, one in each line. I have so far tested this code using two corpuses: English and Russian.
+A universal Wordle solver that works with any language. All you need is a corpus for your language: a text file containing words, one in each line. I have so far tested this code using three langugages:
+* English
+* Persian
+* Russian
 
-Run this command to run the solver for english:
+Run one of the following commands to run the solver for one of the supported languages:
 
 ```python3 WordleSolver.py eng```
 
-and for Russian:
+```python3 WordleSolver.py per```
 
 ```python3 WordleSolver.py rus```
+
+If you like me to add support for another langauge please let me know.
 
 # Methodology
 ## Letter Frequency
@@ -65,9 +70,10 @@ In other words we calculate a different frequecy value for each letter in each p
 (9) >>>>>>> sauce <<<<<<< score: 0.6095
 (10) >>>>>>> slice <<<<<<< score: 0.6086
 ```
-So based on this list the top word for our first attempt is **saine**.
-## Subsequent Attemps
-After getting feedback for our first attempt (in the form of green, yellow, and gray colors assigned to each letter) we update our positional letter frequency and then recalculate the score of all words to find the best next word.
+## Opening Guess
+So based on the previous list of top words, the best opening word is **saine**.
+## Subsequent Guesses
+After getting feedback for the first guess (in the form of green, yellow, and gray colors assigned to each letter) we update our positional letter frequency and then recalculate the score of all words to find the best next word.
 ### Gray Letters
 We simply set the frequecy of all gray letters to a negative value making sure our next attemps will not include gray letters.
 ### Yellow Letters
@@ -77,3 +83,39 @@ We set the frequecy of the green letter at the observer position to `MAX_PROB` a
 
 ## Exploitation vs. Exploration Tradeoff
 DRAFT
+
+# Other Languages
+## Persian
+Here are the list of top opening words:
+
+```
+(1) >>>>>>> مرادی <<<<<<< score: 0.7361
+(2) >>>>>>> موازی <<<<<<< score: 0.6852
+(3) >>>>>>> مبانی <<<<<<< score: 0.6835
+(4) >>>>>>> مکانی <<<<<<< score: 0.671
+(5) >>>>>>> مجانی <<<<<<< score: 0.6699
+(6) >>>>>>> معادی <<<<<<< score: 0.6614
+(7) >>>>>>> موارد <<<<<<< score: 0.6552
+```
+
+Note when you enter the feedback for your guesses (green, yellow, black) you read the feedback right-to-left (as you read the word) and enter them one by one. For example consider the following example:
+
+![alt text](./images/Persian-Wordle-example.jpg)
+
+For the first guess the feedback must be 'bybby' as you read word 'مرادی'. The feedback for the second guess should be 'ybgyb' and so on.
+
+## Russian
+Here are the list of top opening words:
+
+```
+(1) >>>>>>> порка <<<<<<< score: 0.6324
+(2) >>>>>>> полка <<<<<<< score: 0.6143
+(3) >>>>>>> сотка <<<<<<< score: 0.6052
+(4) >>>>>>> горка <<<<<<< score: 0.5853
+(5) >>>>>>> норка <<<<<<< score: 0.5849
+(6) >>>>>>> серна <<<<<<< score: 0.5835
+(7) >>>>>>> совка <<<<<<< score: 0.5783
+```
+
+# Credit
+For english I am using [Wordle's original dictionaries](https://github.com/AllValley/WordleDictionary). For russian I am using [this corpus](https://www.kaggle.com/bifus1/-russian-words). For persian I am using [this corpus](https://github.com/PersianWordle/Main).
