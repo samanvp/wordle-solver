@@ -196,4 +196,9 @@ Note when you enter the feedback for your guesses (green, yellow, black) you rea
 For the first guess the feedback must be 'bybby' as you read word 'مرادی'. The feedback for the second guess should be 'ybgyb' and so on.
 
 # Credit
-For english I am using [Wordle's original dictionaries](https://github.com/AllValley/WordleDictionary). For russian I am using [this corpus](https://www.kaggle.com/bifus1/-russian-words). For persian I am using [this corpus](https://github.com/PersianWordle/Main).
+* For english corpus:
+  * I am using [Wordle's original dictionaries](https://github.com/AllValley/WordleDictionary).
+  * I Also utilIzed [Donald Knuth's GraphBase list of five-letter words](https://github.com/charlesreid1/five-letter-words).
+* For Dutch (NL) I am using [WOORDLE](https://github.com/pingiun/woordle).
+* For Russian I am using [this corpus](https://www.kaggle.com/bifus1/-russian-words).
+* For Persian I am using [Persian Wordle](https://github.com/PersianWordle/Main).
