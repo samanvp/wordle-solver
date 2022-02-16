@@ -1,16 +1,15 @@
 # wordle-solver
-A universal Wordle solver that works with any language. All you need is a corpus for your language: a text file containing words, one in each line. I have so far tested this code using three langugages:
+A universal Wordle solver that works with any language. All you need is a corpus for your language: a text file containing words, one in each line. I have so far tested this code using the following langugages:
+* Dutch (NL)
 * English
 * Persian
 * Russian
 
-Run one of the following commands to run the solver for one of the supported languages:
+Run this command to execute the solver for one of the supported languages:
 
-```python3 WordleSolver.py eng```
+```python3 WordleSolver.py <LANG> [<SIZE>]```
 
-```python3 WordleSolver.py per```
-
-```python3 WordleSolver.py rus```
+where `<LANG>` can get one of these values: `['dut', 'eng', 'rus', 'per']`. Optional `<SIZE>` flag is used to set the size of the words (default set to 5 letter words).
 
 If you like me to add support for another langauge please let me know.
 
@@ -85,10 +84,102 @@ We set the frequecy of the green letter at the observer position to `MAX_PROB` a
 DRAFT
 
 # Other Languages
-## Persian
-Here are the list of top opening words:
+## Dutch (NL)
+Here is the list of top 5 letter openning owrds:
 
 ```
+$ python3 WordleSolver.py dut 
+Corpus contains 17132 words.
+Corpus contains 5613 correct words with length 5
+
+Best 7 words are:
+(1) >>>>>>> baret <<<<<<< score: 0.8197
+(2) >>>>>>> baren <<<<<<< score: 0.8139
+(3) >>>>>>> karet <<<<<<< score: 0.8127
+(4) >>>>>>> sagen <<<<<<< score: 0.8092
+(5) >>>>>>> salet <<<<<<< score: 0.8081
+(6) >>>>>>> karen <<<<<<< score: 0.8069
+(7) >>>>>>> baten <<<<<<< score: 0.8023
+```
+
+and top 6 letter ones:
+
+```
+$ python3 WordleSolver.py dut 6
+Corpus contains 17132 words.
+Corpus contains 11519 correct words with length 6
+
+Best 7 words are:
+(1) >>>>>>> sarden <<<<<<< score: 0.9554
+(2) >>>>>>> marien <<<<<<< score: 0.954
+(3) >>>>>>> porien <<<<<<< score: 0.951
+(4) >>>>>>> gorten <<<<<<< score: 0.9448
+(5) >>>>>>> parten <<<<<<< score: 0.9448
+(6) >>>>>>> barden <<<<<<< score: 0.9413
+(7) >>>>>>> porten <<<<<<< score: 0.9387
+```
+
+## Russian
+Here is the list of top opening 5 letter words:
+
+```
+$ python3 WordleSolver.py rus
+Corpus contains 39344 words.
+Corpus contains 2862 correct words with length 5
+
+Best 7 words are:
+(1) >>>>>>> порка <<<<<<< score: 0.6324
+(2) >>>>>>> полка <<<<<<< score: 0.6143
+(3) >>>>>>> сотка <<<<<<< score: 0.6052
+(4) >>>>>>> горка <<<<<<< score: 0.5853
+(5) >>>>>>> норка <<<<<<< score: 0.5849
+(6) >>>>>>> серна <<<<<<< score: 0.5835
+(7) >>>>>>> совка <<<<<<< score: 0.5783
+```
+
+Because the Russian corpus has words with many different lengths you could run it with different `<SIZE>` values. Here are top 4 letter words:
+
+```
+$ python3 WordleSolver.py rus 4
+Corpus contains 39344 words.
+Corpus contains 1424 correct words with length 4
+
+Best 7 words are:
+(1) >>>>>>> сера <<<<<<< score: 0.4726
+(2) >>>>>>> пора <<<<<<< score: 0.4719
+(3) >>>>>>> кора <<<<<<< score: 0.467
+(4) >>>>>>> сура <<<<<<< score: 0.448
+(5) >>>>>>> пола <<<<<<< score: 0.4459
+(6) >>>>>>> сода <<<<<<< score: 0.4361
+(7) >>>>>>> гора <<<<<<< score: 0.4326
+```
+
+and here are top 6 letter words:
+
+```
+$ python3 WordleSolver.py rus 6
+Corpus contains 39344 words.
+Corpus contains 4057 correct words with length 6
+
+Best 7 words are:
+(1) >>>>>>> парить <<<<<<< score: 0.8886
+(2) >>>>>>> палить <<<<<<< score: 0.8595
+(3) >>>>>>> сорить <<<<<<< score: 0.8558
+(4) >>>>>>> полить <<<<<<< score: 0.8467
+(5) >>>>>>> корить <<<<<<< score: 0.8445
+(6) >>>>>>> салить <<<<<<< score: 0.8395
+(7) >>>>>>> калить <<<<<<< score: 0.8282
+```
+
+## Persian
+Here is the list of top opening words:
+
+```
+$ python3 WordleSolver.py per
+Corpus contains 1766 words.
+Corpus contains 1766 correct words with length 5
+Best 7 words are:
+
 (1) >>>>>>> مرادی <<<<<<< score: 0.7361
 (2) >>>>>>> موازی <<<<<<< score: 0.6852
 (3) >>>>>>> مبانی <<<<<<< score: 0.6835
@@ -103,19 +194,6 @@ Note when you enter the feedback for your guesses (green, yellow, black) you rea
 ![alt text](./images/Persian-Wordle-example.jpg)
 
 For the first guess the feedback must be 'bybby' as you read word 'مرادی'. The feedback for the second guess should be 'ybgyb' and so on.
-
-## Russian
-Here are the list of top opening words:
-
-```
-(1) >>>>>>> порка <<<<<<< score: 0.6324
-(2) >>>>>>> полка <<<<<<< score: 0.6143
-(3) >>>>>>> сотка <<<<<<< score: 0.6052
-(4) >>>>>>> горка <<<<<<< score: 0.5853
-(5) >>>>>>> норка <<<<<<< score: 0.5849
-(6) >>>>>>> серна <<<<<<< score: 0.5835
-(7) >>>>>>> совка <<<<<<< score: 0.5783
-```
 
 # Credit
 For english I am using [Wordle's original dictionaries](https://github.com/AllValley/WordleDictionary). For russian I am using [this corpus](https://www.kaggle.com/bifus1/-russian-words). For persian I am using [this corpus](https://github.com/PersianWordle/Main).

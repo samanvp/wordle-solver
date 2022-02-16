@@ -2,10 +2,12 @@ import re
 import sys
 
 MAX_PROB = 1.0
-PUZZLE_SIZE = 5
+DEFAULT_PUZZLE_SIZE = 5
 GREEN_COEFF = 1.6
 NUM_TOP_WORDS = 7
 
+DUT_CORPUS = './corpuses/dutch-all-words.txt'
+DUT_SOLUTIONS = './corpuses/dutch-puzzle-words.txt'
 ENGLISH_CORPUS = './corpuses/sgb-words.txt'
 RUSSIAN_CORPUS = './corpuses/Russian-words.txt'
 PERSIAN_CORPUS = './corpuses/PersianWordList.txt'
@@ -13,24 +15,29 @@ WORDLE_CORPUS = './corpuses/wordle_complete_dictionary.txt'
 WORDLE_SOLUTIONS = './corpuses/wordle_solutions_alphabetized.txt'
 
 class CorpusLoader:
-    def __init__(self, language):
+    def __init__(self, language, puzzleSize):
         self.langague = language
+        self.puzzleSize = puzzleSize
 
     def getWords(self):
-        if self.langague == 'eng':
-            return self.loadWords(WORDLE_CORPUS)
+        if self.langague == 'dut':
+            return self.loadWords(DUT_CORPUS, True)
+        elif self.langague == 'eng':
+            return self.loadWords(WORDLE_CORPUS, True)
             # Experimental
             #return self.loadWords(WORDLE_SOLUTIONS)
             #return self.loadWords(ENGLISH_CORPUS)
         elif self.langague == 'rus':
-            return self.loadWords(RUSSIAN_CORPUS)
+            return self.loadWords(RUSSIAN_CORPUS, True)
         elif self.langague == 'per':
             return self.loadWords(PERSIAN_CORPUS, True)
         else:
-            raise ValueError('Unknown langage: {} please enter either "eng" or "rus"'.format(self.langague))
+            raise ValueError('Unknown langage: {}'.format(self.langague))
 
     def getLettersFreq(self):
-        if self.langague == 'eng':
+        if self.langague == 'dut':
+            return self.countLetters(self.loadWords(DUT_SOLUTIONS))
+        elif self.langague == 'eng':
             return self.countLetters(self.loadWords(WORDLE_SOLUTIONS))
             #return self.countLetters(self.loadWords(WORDLE_CORPUS))
             #return self.countLetters(self.countLetters(ENGLISH_CORPUS))
@@ -39,30 +46,31 @@ class CorpusLoader:
         elif self.langague == 'per':
             return self.countLetters(self.loadWords(PERSIAN_CORPUS))
         else:
-            raise ValueError('Unknown langage: {} please enter either "eng" or "rus"'.format(self.langague))
+            raise ValueError('Unknown langage: {}'.format(self.langague))
 
     def loadWords(self, filename, verbose=False):
         words = []
         with open(filename, 'r') as f:
             words = f.read().splitlines()
+
         if verbose:
-            print('Conpus contains {} words.'.format(len(words)))
+            print('Corpus contains {} words.'.format(len(words)))
          
         selectedWords = []
         for word in words:
-            word = word.strip()
-            if len(word) != PUZZLE_SIZE or word.find('-') != -1:
+            word = word.lower().strip()
+            if re.search(r'[\s\-_]', word) or len(word) != self.puzzleSize:
                 continue
             selectedWords.append(word)
 
         if verbose:
-            print('Corpus contains {} correct words with length {}'.format(len(selectedWords), PUZZLE_SIZE))
+            print('Corpus contains {} correct words with length {}'.format(len(selectedWords), self.puzzleSize))
         return selectedWords
 
     def countLetters(self, words):
         counts = dict()
         for word in words:
-            for i in range(PUZZLE_SIZE):
+            for i in range(self.puzzleSize):
                 key = (i, word[i])
                 if counts.get(key):
                     counts[key] += 1
@@ -80,7 +88,7 @@ class CorpusLoader:
         numWords = len(words)
         for key, value in counts.items():
             if key[0] == -1:
-                counts[key] = value / (numWords * PUZZLE_SIZE)
+                counts[key] = value / (numWords * self.puzzleSize)
             else:
                 counts[key] = value / numWords
         
@@ -91,13 +99,14 @@ class CorpusLoader:
         return counts
 
 class Solver:
-    def __init__(self, words, lettersFreq):
+    def __init__(self, words, lettersFreq, puzzleSize):
         self.words = words
         self.lettersFreq = lettersFreq
+        self.puzzleSize = puzzleSize
    
     def getScore(self, word, removeDups=True):
         scores = []
-        for i in range(PUZZLE_SIZE):
+        for i in range(self.puzzleSize):
             letter = word[i]
             key = (i, letter)
             if self.counts.get(key):
@@ -118,7 +127,7 @@ class Solver:
                     keep = subScores.index(max(subScores))
                     for i in range(len(dups)):
                         if i != keep:
-                            if scores[dups[i]] == MAX_PROB or scores[dups[i]] == -1 * PUZZLE_SIZE * MAX_PROB:
+                            if scores[dups[i]] == MAX_PROB or scores[dups[i]] == -1 * self.puzzleSize * MAX_PROB:
                                 continue;  # This is is green letter, we do not subtract it's score.
                             scores[dups[i]] = 0
                     alreadyDeDuped.add(letter)
@@ -142,43 +151,43 @@ class Solver:
     def validateFeedback(self):
         validFeedback = False
         feedback = ''
-        print('Feedback: ', end='')
+        print('What are the {} colors (g)Green, (y)Yellow, (b)Black: '.format(self.puzzleSize), end='')
         while(not validFeedback):
-            feedback = input()
-            if len(feedback) != PUZZLE_SIZE or not re.fullmatch(r'[BbYyGg]*', feedback):
-                print('Wrong feedback format, please try again:')
+            feedback = input().lower()
+            if len(feedback) != self.puzzleSize or not re.fullmatch(r'[byg]*', feedback):
+                print('Wrong colors, please enter {} colors (g)Green, (y)Yellow, (b)Black: '.format(self.puzzleSize))
                 continue
             validFeedback = True
         return feedback
 
     def parseFeedback(self, word, feedback):
         blacks = set()
-        yellows = [None] * PUZZLE_SIZE
-        greens = [None] * PUZZLE_SIZE
-        for i in range(PUZZLE_SIZE):
+        yellows = [None] * self.puzzleSize
+        greens = [None] * self.puzzleSize
+        for i in range(self.puzzleSize):
             f = feedback[i]
-            if f in ('B', 'b'):
+            if f == 'b':
                 blacks.add(word[i])
-            if f in ('Y', 'y'):
+            if f == 'y':
                 yellows[i] = word[i]
-            if f in ('G', 'g'):
+            if f == 'g':
                 greens[i] = word[i]
         return (greens, yellows, blacks)    
 
     def initState(self):
         self.counts = self.lettersFreq.copy()
-        self.greens = [None] * PUZZLE_SIZE
-        self.yellows = [ [] for _ in range(PUZZLE_SIZE) ]
+        self.greens = [None] * self.puzzleSize
+        self.yellows = [ [] for _ in range(self.puzzleSize) ]
         self.blacks = set()
         self.guessNo = 0
  
     def updateState(self, latestGreens, latestYellows, latestBlacks):
-        newGreens = [None] * PUZZLE_SIZE
-        newYellows = [None] * PUZZLE_SIZE
+        newGreens = [None] * self.puzzleSize
+        newYellows = [None] * self.puzzleSize
         removedYellows = set()
 
         # First update the Greens
-        for i in range(PUZZLE_SIZE):
+        for i in range(self.puzzleSize):
             if latestGreens[i]:
                 if self.greens[i]:
                     if self.greens[i] != latestGreens[i]:
@@ -188,12 +197,12 @@ class Solver:
                     self.greens[i] = newGreenLetter
                     newGreens[i] = newGreenLetter
                     # Now find out whether we previosly have seen this letter as a yellow one?
-                    for j in range(PUZZLE_SIZE):
+                    for j in range(self.puzzleSize):
                         if newGreenLetter in self.yellows[j]:
                             removedYellows.add(newGreenLetter)
                             self.yellows[j].remove(newGreenLetter)
         # Next update the Yellows
-        for i in range(PUZZLE_SIZE):
+        for i in range(self.puzzleSize):
             if latestYellows[i]:
                 if not latestYellows[i] in self.yellows[i]:
                     newYellowLetter = latestYellows[i]
@@ -204,7 +213,7 @@ class Solver:
         return (newGreens, newYellows, removedYellows)
 
     def exploitGreens(self):
-        for i in range(PUZZLE_SIZE):
+        for i in range(self.puzzleSize):
             if self.greens[i]:
                 greenLetter = self.greens[i]
                 for key, _ in self.counts.items():
@@ -212,17 +221,17 @@ class Solver:
                         if key[1] == greenLetter:
                             self.counts[key] = MAX_PROB
                         else:
-                            self.counts[key] =  -1 * PUZZLE_SIZE * MAX_PROB
+                            self.counts[key] =  -1 * self.puzzleSize * MAX_PROB
 
     def updateWeights(self, newGreens, newYellows, latestBlacks, removedYellows):
         for letter in latestBlacks:
-            for i in range(PUZZLE_SIZE):
+            for i in range(self.puzzleSize):
                 key = (i, letter)
-                self.counts[key] = -1 * PUZZLE_SIZE * MAX_PROB
+                self.counts[key] = -1 * self.puzzleSize * MAX_PROB
 
         # Reverse the change made by an old Yellow letter
         for removedYellowLetter in removedYellows:
-            for j in range(PUZZLE_SIZE):
+            for j in range(self.puzzleSize):
                 key = (j, removedYellowLetter)
                 if self.counts[key] < 0:
                     continue
@@ -231,12 +240,12 @@ class Solver:
 
         # Apply new Yellows
         missingLettersCount = sum(elem is None for elem in self.greens)
-        for i in range(PUZZLE_SIZE):
+        for i in range(self.puzzleSize):
             if newYellows[i]:
                 newYellowLetter = newYellows[i]
                 key = (i, newYellowLetter)
-                self.counts[key] = -1 * PUZZLE_SIZE * MAX_PROB
-                for j in range(PUZZLE_SIZE):
+                self.counts[key] = -1 * self.puzzleSize * MAX_PROB
+                for j in range(self.puzzleSize):
                     if j == i or self.greens[j]:
                         continue
                     else:
@@ -249,7 +258,7 @@ class Solver:
             # We aggresivly set all green weights to converge faster
             self.exploitGreens()
         else:
-            for i in range(PUZZLE_SIZE):
+            for i in range(self.puzzleSize):
                 if newGreens[i]:
                     newGreenLetter = newGreens[i]
                     key = (i, newGreenLetter)
@@ -281,7 +290,8 @@ class Solver:
     def playGame(self, verbose=False):
         self.initState()
         feedbackColors = ''
-        while(feedbackColors != 'ggggg'):
+        win = 'g' * self.puzzleSize
+        while(feedbackColors != win):
             self.guessNo += 1
             try:
                 topWords = self.findTopWord()
@@ -303,18 +313,37 @@ class Solver:
 
                 print('Current Blacks: ')
                 print(sorted(list(self.blacks)))
-        if feedbackColors == 'ggggg':
+        if feedbackColors == win:
             print('Solved by {} guesses!'.format(self.guessNo))
         else:
             print('Failed to find a solution after {} guesses.'.format(self.guessNo))
 
+def showError(supportedLangs):
+    print('Please run `python3 WordleSolver.py <LANG> [<SIZE>]`')
+    print('where <LANG> can be one of the supported langages:  ', end='')
+    for lang in supportedLangs:
+        print(lang, end=' ')
+    print('\n And <SIZE> is the length of the puzzle (default set to 5).')
+
 def main():
-    if len(sys.argv) != 2 or sys.argv[1] not in ['eng', 'rus', 'per']:
-        print('Please run `python3 WordleSolver.py eng` or `python3 WordleSolver.py rus` or `python3 WordleSolver.py per`')
+    supportedLangs = ['dut', 'eng', 'rus', 'per']
+    puzzleSize = DEFAULT_PUZZLE_SIZE 
+    if len(sys.argv) < 2 or len(sys.argv) > 3:
+        showError(supportedLangs)
         exit(1)
-    corpus = CorpusLoader(sys.argv[1])
-    solver = Solver(corpus.getWords(), corpus.getLettersFreq())
-    solver.playGame(True)
+    elif sys.argv[1] not in supportedLangs:
+        showError(supportedLangs)
+        exit(1)
+    elif len(sys.argv) == 3:
+        if not sys.argv[2].isnumeric():
+            showError(supportedLangs)
+            exit(1)
+        else:
+            puzzleSize = int(sys.argv[2])
+
+    corpus = CorpusLoader(sys.argv[1], puzzleSize)
+    solver = Solver(corpus.getWords(), corpus.getLettersFreq(), puzzleSize)
+    solver.playGame(False)
     
 if __name__ == '__main__':
     main()
