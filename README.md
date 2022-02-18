@@ -202,5 +202,5 @@ For the first guess the feedback must be 'bybby' as you read word 'مرادی'. 
 * For Dutch (NL) I am using [WOORDLE](https://github.com/pingiun/woordle).
 * For Russian I am using [this Lexicon](https://www.kaggle.com/bifus1/-russian-words).
 * For Persian:
-  * I am using [Persian Lexixon](https://github.com/samanvp/persian-lexicon).
+  * I am using [Persian Lexicon](https://github.com/samanvp/persian-lexicon).
   * I also utilized [PersianWordle](https://github.com/PersianWordle/Main).
