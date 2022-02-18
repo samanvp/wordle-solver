@@ -85,7 +85,7 @@ DRAFT
 
 # Other Languages
 ## Dutch (NL)
-Here is the list of top 5 letter openning owrds:
+Here is the list of top 5 letter openning words:
 
 ```
 $ python3 WordleSolver.py dut 
@@ -198,7 +198,7 @@ For the first guess the feedback must be 'bybby' as you read word 'مرادی'. 
 # Credit
 * For english corpus:
   * I am using [Wordle's original dictionaries](https://github.com/AllValley/WordleDictionary).
-  * I Also utilIzed [Donald Knuth's GraphBase list of five-letter words](https://github.com/charlesreid1/five-letter-words).
+  * I Also utilized [Donald Knuth's GraphBase list of five-letter words](https://github.com/charlesreid1/five-letter-words).
 * For Dutch (NL) I am using [WOORDLE](https://github.com/pingiun/woordle).
 * For Russian I am using [this corpus](https://www.kaggle.com/bifus1/-russian-words).
 * For Persian I am using [Persian Wordle](https://github.com/PersianWordle/Main).

@@ -6,31 +6,28 @@ DEFAULT_PUZZLE_SIZE = 5
 GREEN_COEFF = 1.6
 NUM_TOP_WORDS = 7
 
-DUT_CORPUS = './corpuses/dutch-all-words.txt'
-DUT_SOLUTIONS = './corpuses/dutch-puzzle-words.txt'
-ENGLISH_CORPUS = './corpuses/sgb-words.txt'
-RUSSIAN_CORPUS = './corpuses/Russian-words.txt'
-PERSIAN_CORPUS = './corpuses/PersianWordList.txt'
-WORDLE_CORPUS = './corpuses/wordle_complete_dictionary.txt'
-WORDLE_SOLUTIONS = './corpuses/wordle_solutions_alphabetized.txt'
+DUT_LEXICON = './Lexicons/dutch-all-words.txt'
+DUT_SOLUTIONS = './Lexicons/dutch-puzzle-words.txt'
+ENGLISH_LEXICON = './Lexicons/sgb-words.txt'
+RUSSIAN_LEXICON = './Lexicons/Russian-words.txt'
+PERSIAN_LEXICON = './Lexicons/persian-words-5letter.txt'
+WORDLE_LEXICON = './Lexicons/wordle_complete_dictionary.txt'
+WORDLE_SOLUTIONS = './Lexicons/wordle_solutions_alphabetized.txt'
 
-class CorpusLoader:
+class LexiconLoader:
     def __init__(self, language, puzzleSize):
         self.langague = language
         self.puzzleSize = puzzleSize
 
     def getWords(self):
         if self.langague == 'dut':
-            return self.loadWords(DUT_CORPUS, True)
+            return self.loadWords(DUT_LEXICON, True)
         elif self.langague == 'eng':
-            return self.loadWords(WORDLE_CORPUS, True)
-            # Experimental
-            #return self.loadWords(WORDLE_SOLUTIONS)
-            #return self.loadWords(ENGLISH_CORPUS)
+            return self.loadWords(WORDLE_LEXICON, True)
         elif self.langague == 'rus':
-            return self.loadWords(RUSSIAN_CORPUS, True)
+            return self.loadWords(RUSSIAN_LEXICON, True)
         elif self.langague == 'per':
-            return self.loadWords(PERSIAN_CORPUS, True)
+            return self.loadWords(PERSIAN_LEXICON, True)
         else:
             raise ValueError('Unknown langage: {}'.format(self.langague))
 
@@ -39,12 +36,10 @@ class CorpusLoader:
             return self.countLetters(self.loadWords(DUT_SOLUTIONS))
         elif self.langague == 'eng':
             return self.countLetters(self.loadWords(WORDLE_SOLUTIONS))
-            #return self.countLetters(self.loadWords(WORDLE_CORPUS))
-            #return self.countLetters(self.countLetters(ENGLISH_CORPUS))
         elif self.langague == 'rus':
-            return self.countLetters(self.loadWords(RUSSIAN_CORPUS))
+            return self.countLetters(self.loadWords(RUSSIAN_LEXICON))
         elif self.langague == 'per':
-            return self.countLetters(self.loadWords(PERSIAN_CORPUS))
+            return self.countLetters(self.loadWords(PERSIAN_LEXICON))
         else:
             raise ValueError('Unknown langage: {}'.format(self.langague))
 
@@ -54,7 +49,7 @@ class CorpusLoader:
             words = f.read().splitlines()
 
         if verbose:
-            print('Corpus contains {} words.'.format(len(words)))
+            print('Lexicon contains {} words.'.format(len(words)))
          
         selectedWords = []
         for word in words:
@@ -64,7 +59,7 @@ class CorpusLoader:
             selectedWords.append(word)
 
         if verbose:
-            print('Corpus contains {} correct words with length {}'.format(len(selectedWords), self.puzzleSize))
+            print('Lexicon contains {} correct words with length {}.\n'.format(len(selectedWords), self.puzzleSize))
         return selectedWords
 
     def countLetters(self, words):
@@ -296,7 +291,7 @@ class Solver:
             try:
                 topWords = self.findTopWord()
             except:
-                print('No word in the current corpus matches the feedback.')
+                print('No word in the current Lexicon matches the feedback.')
                 break
             topWord = self.readUsedWord(topWords)
             feedbackColors = self.validateFeedback()
@@ -341,8 +336,8 @@ def main():
         else:
             puzzleSize = int(sys.argv[2])
 
-    corpus = CorpusLoader(sys.argv[1], puzzleSize)
-    solver = Solver(corpus.getWords(), corpus.getLettersFreq(), puzzleSize)
+    Lexicon = LexiconLoader(sys.argv[1], puzzleSize)
+    solver = Solver(Lexicon.getWords(), Lexicon.getLettersFreq(), puzzleSize)
     solver.playGame(False)
     
 if __name__ == '__main__':
