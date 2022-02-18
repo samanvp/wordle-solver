@@ -8,7 +8,6 @@ NUM_TOP_WORDS = 7
 
 DUT_LEXICON = './Lexicons/dutch-all-words.txt'
 DUT_SOLUTIONS = './Lexicons/dutch-puzzle-words.txt'
-ENGLISH_LEXICON = './Lexicons/sgb-words.txt'
 RUSSIAN_LEXICON = './Lexicons/Russian-words.txt'
 PERSIAN_LEXICON = './Lexicons/persian-words-5letter.txt'
 WORDLE_LEXICON = './Lexicons/wordle_complete_dictionary.txt'

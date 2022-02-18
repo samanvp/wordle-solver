@@ -1,5 +1,5 @@
 # wordle-solver
-A universal Wordle solver that works with any language. All you need is a corpus for your language: a text file containing words, one in each line. I have so far tested this code using the following langugages:
+A universal Wordle solver that works with any language. All you need is a lexicon for your language: a text file containing words, one in each line. I have so far tested this code using the following langugages:
 * Dutch (NL)
 * English
 * Persian
@@ -89,8 +89,8 @@ Here is the list of top 5 letter openning words:
 
 ```
 $ python3 WordleSolver.py dut 
-Corpus contains 17132 words.
-Corpus contains 5613 correct words with length 5
+Lexicon contains 17132 words.
+Lexicon contains 5613 correct words with length 5
 
 Best 7 words are:
 (1) >>>>>>> baret <<<<<<< score: 0.8197
@@ -106,8 +106,8 @@ and top 6 letter ones:
 
 ```
 $ python3 WordleSolver.py dut 6
-Corpus contains 17132 words.
-Corpus contains 11519 correct words with length 6
+Lexicon contains 17132 words.
+Lexicon contains 11519 correct words with length 6
 
 Best 7 words are:
 (1) >>>>>>> sarden <<<<<<< score: 0.9554
@@ -124,8 +124,8 @@ Here is the list of top opening 5 letter words:
 
 ```
 $ python3 WordleSolver.py rus
-Corpus contains 39344 words.
-Corpus contains 2862 correct words with length 5
+Lexicon contains 39344 words.
+Lexicon contains 2862 correct words with length 5
 
 Best 7 words are:
 (1) >>>>>>> порка <<<<<<< score: 0.6324
@@ -137,12 +137,12 @@ Best 7 words are:
 (7) >>>>>>> совка <<<<<<< score: 0.5783
 ```
 
-Because the Russian corpus has words with many different lengths you could run it with different `<SIZE>` values. Here are top 4 letter words:
+Because the Russian Lexicon has words with many different lengths you could run it with different `<SIZE>` values. Here are top 4 letter words:
 
 ```
 $ python3 WordleSolver.py rus 4
-Corpus contains 39344 words.
-Corpus contains 1424 correct words with length 4
+Lexicon contains 39344 words.
+Lexicon contains 1424 correct words with length 4
 
 Best 7 words are:
 (1) >>>>>>> сера <<<<<<< score: 0.4726
@@ -158,8 +158,8 @@ and here are top 6 letter words:
 
 ```
 $ python3 WordleSolver.py rus 6
-Corpus contains 39344 words.
-Corpus contains 4057 correct words with length 6
+Lexicon contains 39344 words.
+Lexicon contains 4057 correct words with length 6
 
 Best 7 words are:
 (1) >>>>>>> парить <<<<<<< score: 0.8886
@@ -176,17 +176,17 @@ Here is the list of top opening words:
 
 ```
 $ python3 WordleSolver.py per
-Corpus contains 1766 words.
-Corpus contains 1766 correct words with length 5
-Best 7 words are:
+Lexicon contains 11024 words.
+Lexicon contains 10044 correct words with length 5.
 
-(1) >>>>>>> مرادی <<<<<<< score: 0.7361
-(2) >>>>>>> موازی <<<<<<< score: 0.6852
-(3) >>>>>>> مبانی <<<<<<< score: 0.6835
-(4) >>>>>>> مکانی <<<<<<< score: 0.671
-(5) >>>>>>> مجانی <<<<<<< score: 0.6699
-(6) >>>>>>> معادی <<<<<<< score: 0.6614
-(7) >>>>>>> موارد <<<<<<< score: 0.6552
+Best 7 words are:
+(1) >>>>>>> مرادی <<<<<<< score: 0.719
+(2) >>>>>>> موادی <<<<<<< score: 0.7157
+(3) >>>>>>> مراتی <<<<<<< score: 0.7155
+(4) >>>>>>> ملاوی <<<<<<< score: 0.7026
+(5) >>>>>>> مولای <<<<<<< score: 0.6793
+(6) >>>>>>> موازی <<<<<<< score: 0.6749
+(7) >>>>>>> مساوی <<<<<<< score: 0.673
 ```
 
 Note when you enter the feedback for your guesses (green, yellow, black) you read the feedback right-to-left (as you read the word) and enter them one by one. For example consider the following example:
@@ -196,9 +196,11 @@ Note when you enter the feedback for your guesses (green, yellow, black) you rea
 For the first guess the feedback must be 'bybby' as you read word 'مرادی'. The feedback for the second guess should be 'ybgyb' and so on.
 
 # Credit
-* For english corpus:
+* For english:
   * I am using [Wordle's original dictionaries](https://github.com/AllValley/WordleDictionary).
   * I Also utilized [Donald Knuth's GraphBase list of five-letter words](https://github.com/charlesreid1/five-letter-words).
 * For Dutch (NL) I am using [WOORDLE](https://github.com/pingiun/woordle).
-* For Russian I am using [this corpus](https://www.kaggle.com/bifus1/-russian-words).
-* For Persian I am using [Persian Wordle](https://github.com/PersianWordle/Main).
+* For Russian I am using [this Lexicon](https://www.kaggle.com/bifus1/-russian-words).
+* For Persian:
+  * I am using [Persian Lexixon](https://github.com/samanvp/persian-lexicon).
+  * I also utilized [PersianWordle](https://github.com/PersianWordle/Main).
