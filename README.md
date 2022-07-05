@@ -4,6 +4,7 @@ A universal Wordle solver that works with any language. All you need is a lexico
 * English
 * Persian
 * Russian
+* more languages to come...
 
 Run this command to execute the solver for one of the supported languages:
 
