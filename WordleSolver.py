@@ -1,6 +1,7 @@
 import re
 import sys
 
+
 MAX_PROB = 1.0
 DEFAULT_PUZZLE_SIZE = 5
 GREEN_COEFF = 1.6
