@@ -274,7 +274,7 @@ class Solver:
             while (not topWord):
                 print('Please enter the word you used: ', end='')
                 topWord = input()
-                if len(topWord) != 5 or not topWord.isalpha():
+                if len(topWord) != self.puzzleSize or not topWord.isalpha():
                     topWord = ''
                 else:
                     topWord = topWord.lower()
